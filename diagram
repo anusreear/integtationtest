@@ -1,0 +1,94 @@
+                        ┌─────────────────────────────┐
+                        │        VS Code User         │
+                        │  Command: Generate Tests    │
+                        └──────────────┬──────────────┘
+                                       │
+                                       ▼
+                        ┌─────────────────────────────┐
+                        │     Copilot VSCode Extension │
+                        │  (Orchestrator Controller)  │
+                        └──────────────┬──────────────┘
+                                       │
+                          Select Data Source (UI)
+                                       │
+                   ┌───────────────────┴───────────────────┐
+                   ▼                                       ▼
+        ┌─────────────────────┐               ┌─────────────────────┐
+        │   Local Log Reader  │               │   Splunk Trace API  │
+        │  (Log File Parser)  │               │  (Search + Fetch)   │
+        └──────────┬──────────┘               └──────────┬──────────┘
+                   │                                     │
+                   └───────────────┬─────────────────────┘
+                                   ▼
+                        ┌─────────────────────────┐
+                        │   Interaction Builder   │
+                        │ Extract API Calls       │
+                        │ Request / Response      │
+                        │ Headers / Payloads      │
+                        │ Timestamps / Flow       │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │      AST Code Scanner   │
+                        │                         │
+                        │ Scan Spring Boot Code   │
+                        │ Controllers             │
+                        │ Services                │
+                        │ Feign / RestTemplate    │
+                        │ SOAP Clients            │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │ Dependency Graph Builder│
+                        │                         │
+                        │ API → Service → Client  │
+                        │ External Services       │
+                        │ Runtime Call Flow       │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │  Copilot Prompt Builder │
+                        │                         │
+                        │ Context Assembly        │
+                        │ Logs + AST + Graph      │
+                        │ API Contracts           │
+                        │ WireMock Instructions   │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │    GitHub Copilot Chat  │
+                        │        (LLM)            │
+                        └───────────┬─────────────┘
+                                    │
+                                    ▼
+                        ┌─────────────────────────┐
+                        │  Scenario Generation    │
+                        │                         │
+                        │ Success Flow            │
+                        │ Failure Flow            │
+                        │ Edge Cases              │
+                        └───────────┬─────────────┘
+                                    │
+                    ┌───────────────┴───────────────┐
+                    ▼                               ▼
+        ┌─────────────────────┐         ┌────────────────────────┐
+        │   WireMock Stub     │         │  Integration Test      │
+        │   Generator         │         │  Generator             │
+        │                     │         │                        │
+        │ JSON Stubs         │         │ JUnit / Karate Tests   │
+        │ External APIs      │         │ SpringBootTest         │
+        └──────────┬──────────┘         └──────────┬─────────────┘
+                   │                               │
+                   └───────────────┬───────────────┘
+                                   ▼
+                        ┌─────────────────────────┐
+                        │ Generated Test Suite    │
+                        │                         │
+                        │ WireMock Stubs          │
+                        │ Integration Tests       │
+                        │ Ready to Run in CI/CD   │
+                        └─────────────────────────┘
