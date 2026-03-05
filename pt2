@@ -1,0 +1,264 @@
+You are an expert VS Code extension developer.
+
+Your task is to build a complete VS Code extension in this workspace called:
+
+"log-to-integration-test-generator"
+
+The extension automatically generates integration tests from application logs.
+
+Do the following actions in the workspace:
+- Create folders
+- Create files
+- Write complete working code
+- Ensure the extension compiles and runs
+
+Tech stack
+TypeScript
+VS Code Extension API
+Node.js runtime
+
+Main Goal
+
+The extension scans Spring Boot or Node.js application logs, extracts HTTP request/response interactions, reconstructs API flows, and generates integration tests using WireMock.
+
+The generated tests and stubs should be written into the current project workspace.
+
+-------------------------------------
+
+STEP 1 – CREATE EXTENSION STRUCTURE
+
+Create the following folder structure:
+
+src/
+  extension.ts
+  commands/
+      generateTests.ts
+  parser/
+      logParser.ts
+  builder/
+      interactionBuilder.ts
+  ai/
+      scenarioAgent.ts
+  generator/
+      wiremockGenerator.ts
+      testGenerator.ts
+  utils/
+      fileWriter.ts
+  models/
+      HttpInteraction.ts
+      TestScenario.ts
+
+Also create:
+
+package.json
+tsconfig.json
+README.md
+
+-------------------------------------
+
+STEP 2 – EXTENSION COMMAND
+
+Add a command to the extension:
+
+"Generate Integration Tests from Logs"
+
+When executed the command should:
+
+1 Ask the user to select a log file
+2 Parse the log file
+3 Extract HTTP interactions
+4 Group interactions by traceId
+5 Generate test scenarios
+6 Generate WireMock stubs
+7 Generate integration tests
+8 Write files into the workspace
+
+-------------------------------------
+
+STEP 3 – DATA MODEL
+
+Create model HttpInteraction with fields:
+
+timestamp
+traceId
+method
+url
+requestBody
+responseBody
+status
+
+Example:
+
+{
+ timestamp: string
+ traceId: string
+ method: string
+ url: string
+ requestBody: string
+ responseBody: string
+ status: number
+}
+
+-------------------------------------
+
+STEP 4 – LOG PARSER
+
+Implement logParser.ts.
+
+It should read Spring Boot logs and detect:
+
+HTTP_REQUEST
+REQUEST_BODY
+RESPONSE_STATUS
+RESPONSE_BODY
+
+Return a list of HttpInteraction objects.
+
+-------------------------------------
+
+STEP 5 – FLOW RECONSTRUCTION
+
+Implement interactionBuilder.ts.
+
+Responsibilities:
+
+• Group interactions by traceId
+• Sort interactions by timestamp
+• Return flows
+
+Each flow should represent a single integration test scenario.
+
+-------------------------------------
+
+STEP 6 – AI SCENARIO GENERATOR
+
+Create scenarioAgent.ts.
+
+Input:
+List of HttpInteraction flows.
+
+Responsibilities:
+
+• identify API flows
+• generate test scenario names
+• generate WireMock stub definitions
+
+Return object:
+
+{
+ scenarios:[
+   {
+     name:"",
+     steps:[],
+     stubs:[]
+   }
+ ]
+}
+
+For now mock the AI response.
+
+Structure the code so it can later call an LLM API.
+
+-------------------------------------
+
+STEP 7 – WIREMOCK GENERATOR
+
+Create wiremockGenerator.ts.
+
+Generate stub JSON files like:
+
+{
+ "request":{
+   "method":"POST",
+   "url":"/payment"
+ },
+ "response":{
+   "status":200,
+   "jsonBody":{
+     "status":"SUCCESS"
+   }
+ }
+}
+
+-------------------------------------
+
+STEP 8 – TEST GENERATOR
+
+Create testGenerator.ts.
+
+Generate Spring Boot JUnit tests using WireMock.
+
+Example structure:
+
+@SpringBootTest
+@AutoConfigureWireMock(port = 8089)
+
+class PaymentFlowTest {
+
+@Test
+void testPaymentFlow(){
+
+stubFor(post("/payment")
+ .willReturn(okJson("{"status":"SUCCESS"}")));
+
+}
+
+}
+
+-------------------------------------
+
+STEP 9 – FILE OUTPUT
+
+Generated files must be written to:
+
+src/test/java/generated/
+src/test/resources/wiremock/
+
+Use Node filesystem API.
+
+-------------------------------------
+
+STEP 10 – EXTENSION WORKFLOW
+
+Implement this execution flow:
+
+User runs command
+→ select log file
+→ parse logs
+→ build flows
+→ generate scenarios
+→ generate wiremock stubs
+→ generate integration tests
+→ write files
+
+-------------------------------------
+
+STEP 11 – QUALITY
+
+Add:
+
+TypeScript interfaces
+error handling
+console logging
+VS Code output channel
+
+-------------------------------------
+
+STEP 12 – BONUS FEATURES
+
+If possible also implement:
+
+• OpenAPI scanning
+• multiple log file support
+• progress bar
+• configuration options
+
+-------------------------------------
+
+After creating the extension, ensure it can run using:
+
+npm install
+npm run compile
+press F5 to launch extension host
+
+Generate all files needed for a working extension.
