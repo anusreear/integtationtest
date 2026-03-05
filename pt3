@@ -1,0 +1,390 @@
+You are a senior platform engineer and expert VS Code extension developer.
+
+Your task is to build a production-ready VS Code extension in this workspace called:
+
+"intelligent-integration-test-generator"
+
+The extension should automatically generate integration tests for microservices by combining:
+
+• application logs  
+• source code AST scanning  
+• Splunk distributed traces  
+• dependency graph analysis  
+
+The extension should generate WireMock stubs and integration tests automatically.
+
+Tech Stack
+
+TypeScript
+Node.js
+VS Code Extension API
+
+The project should be modular and designed so it can later integrate AI models.
+
+--------------------------------------------------
+
+SYSTEM GOAL
+
+Automatically generate integration tests from real application behavior.
+
+Inputs
+
+1 Log files from Spring Boot or Node services  
+2 Source code repositories  
+3 Splunk distributed tracing data  
+
+Processing
+
+• parse logs  
+• scan code AST  
+• fetch Splunk traces  
+• build service dependency graph  
+• reconstruct service flows  
+• generate test scenarios  
+
+Outputs
+
+• WireMock stub files  
+• integration tests  
+• test scenarios
+
+--------------------------------------------------
+
+STEP 1 — CREATE PROJECT STRUCTURE
+
+Create the following folders:
+
+src/
+
+ extension.ts
+
+ commands/
+    generateTests.ts
+
+ parser/
+    logParser.ts
+    splunkTraceParser.ts
+
+ ast/
+    javaAstScanner.ts
+    nodeAstScanner.ts
+
+ builder/
+    interactionBuilder.ts
+
+ graph/
+    dependencyGraph.ts
+    graphBuilder.ts
+
+ ai/
+    scenarioAgent.ts
+
+ generator/
+    wiremockGenerator.ts
+    testGenerator.ts
+
+ models/
+    HttpInteraction.ts
+    ServiceNode.ts
+    ServiceEdge.ts
+    TestScenario.ts
+
+ utils/
+    fileWriter.ts
+    logger.ts
+
+Also create:
+
+package.json  
+tsconfig.json  
+README.md  
+
+--------------------------------------------------
+
+STEP 2 — EXTENSION COMMAND
+
+Create a command:
+
+"Generate Intelligent Integration Tests"
+
+Workflow
+
+1 ask user to select log file
+2 scan workspace source code
+3 extract endpoints and service calls using AST
+4 fetch distributed traces from Splunk
+5 parse log interactions
+6 build dependency graph
+7 reconstruct service flows
+8 generate test scenarios
+9 generate WireMock stubs
+10 generate integration tests
+11 write files to workspace
+
+--------------------------------------------------
+
+STEP 3 — LOG PARSER
+
+Implement logParser.ts.
+
+Extract:
+
+timestamp  
+traceId  
+service name  
+HTTP method  
+URL  
+request body  
+response status  
+response body  
+
+Return list of HttpInteraction objects.
+
+--------------------------------------------------
+
+STEP 4 — SPLUNK TRACE INTEGRATION
+
+Implement splunkTraceParser.ts.
+
+Responsibilities:
+
+• query Splunk REST API  
+• retrieve distributed trace flows  
+• map traceId to services  
+
+Return trace structure:
+
+{
+ traceId:"",
+ services:[]
+}
+
+Mock the API response for now but design the code so it can call Splunk REST endpoints later.
+
+--------------------------------------------------
+
+STEP 5 — AST CODE SCANNER
+
+Implement:
+
+javaAstScanner.ts
+nodeAstScanner.ts
+
+Responsibilities
+
+Scan source code to extract:
+
+REST endpoints  
+external API calls  
+service dependencies  
+
+Examples
+
+Java
+
+@RestController
+@GetMapping("/payments")
+
+Node
+
+app.get("/orders")
+
+Return metadata:
+
+{
+ service:"",
+ endpoints:[],
+ dependencies:[]
+}
+
+Use JavaParser style parsing for Java and Babel parser for Node.
+
+--------------------------------------------------
+
+STEP 6 — DEPENDENCY GRAPH
+
+Implement dependencyGraph.ts.
+
+Represent microservice dependencies as graph nodes and edges.
+
+Example
+
+gateway → auth-service
+gateway → payment-service
+payment-service → bank-api
+
+Graph structure
+
+{
+ nodes:[],
+ edges:[]
+}
+
+--------------------------------------------------
+
+STEP 7 — GRAPH BUILDER
+
+Combine information from:
+
+AST scan  
+Splunk traces  
+log interactions  
+
+Build a unified service dependency graph.
+
+--------------------------------------------------
+
+STEP 8 — FLOW RECONSTRUCTION
+
+Implement interactionBuilder.ts.
+
+Group interactions by traceId.
+
+Sort by timestamp.
+
+Reconstruct real microservice call flows.
+
+--------------------------------------------------
+
+STEP 9 — AI SCENARIO GENERATOR
+
+Implement scenarioAgent.ts.
+
+Input
+
+service graph  
+log flows  
+trace flows  
+
+Responsibilities
+
+• identify integration scenarios  
+• generate test names  
+• generate stub requirements  
+
+Return structure
+
+{
+ scenarios:[
+   {
+     name:"",
+     services:[],
+     stubs:[],
+     steps:[]
+   }
+ ]
+}
+
+Mock the AI response for now.
+
+Design the module so it can later call an LLM API.
+
+--------------------------------------------------
+
+STEP 10 — WIREMOCK GENERATOR
+
+Implement wiremockGenerator.ts.
+
+Generate stub JSON files compatible with WireMock.
+
+Example
+
+{
+ "request":{
+   "method":"POST",
+   "url":"/payment"
+ },
+ "response":{
+   "status":200,
+   "jsonBody":{
+     "status":"SUCCESS"
+   }
+ }
+}
+
+--------------------------------------------------
+
+STEP 11 — TEST GENERATOR
+
+Implement testGenerator.ts.
+
+Generate Spring Boot JUnit integration tests.
+
+Structure
+
+@SpringBootTest
+@AutoConfigureWireMock(port = 8089)
+
+class PaymentFlowTest {
+
+@Test
+void testPaymentFlow(){
+
+stubFor(post("/payment")
+ .willReturn(okJson("{"status":"SUCCESS"}")));
+
+}
+
+}
+
+Also design architecture to support Karate tests later.
+
+--------------------------------------------------
+
+STEP 12 — FILE OUTPUT
+
+Generated files must be written to:
+
+src/test/java/generated/
+src/test/resources/wiremock/
+
+--------------------------------------------------
+
+STEP 13 — EXTENSION WORKFLOW
+
+Command execution flow
+
+User triggers command
+→ select log file
+→ scan code AST
+→ fetch Splunk traces
+→ parse logs
+→ build dependency graph
+→ reconstruct flows
+→ generate scenarios
+→ generate stubs
+→ generate tests
+→ write files
+
+--------------------------------------------------
+
+STEP 14 — QUALITY
+
+Ensure:
+
+TypeScript interfaces
+clean modular code
+VS Code output channel logging
+error handling
+extensibility
+
+--------------------------------------------------
+
+STEP 15 — BONUS FEATURES
+
+If possible add:
+
+OpenAPI scanning
+multiple log file support
+progress bar
+configuration options
+test coverage estimation
+
+--------------------------------------------------
+
+After generating the project ensure it runs with:
+
+npm install
+npm run compile
+
+Then launch extension host using F5.
