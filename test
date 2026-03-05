@@ -1,0 +1,188 @@
+You are a senior TypeScript and VS Code extension developer.
+
+Create a complete VS Code extension project that automatically generates integration tests from application logs.
+
+Goal
+The extension should scan Spring Boot or Node.js application logs, extract HTTP request/response interactions, reconstruct API flows using timestamps and correlation IDs, and generate integration tests using WireMock.
+
+The extension should run inside VS Code and write generated tests into the user's workspace.
+
+Requirements
+
+1. Extension Setup
+Create a TypeScript VS Code extension with the following command:
+
+"Generate Integration Tests from Logs"
+
+When the command is executed the extension should:
+
+• Ask the user to select a log file  
+• Parse the log file  
+• Extract HTTP interactions  
+• Send interactions to an AI scenario generator  
+• Generate WireMock stubs  
+• Generate integration tests  
+• Save files in the workspace  
+
+2. Folder Structure
+
+Create the following project structure:
+
+src/
+  extension.ts
+  commands/
+      generateTests.ts
+  parser/
+      logParser.ts
+  builder/
+      interactionBuilder.ts
+  ai/
+      scenarioAgent.ts
+  generator/
+      wiremockGenerator.ts
+      testGenerator.ts
+  utils/
+      fileWriter.ts
+
+3. Log Parsing
+
+Implement a log parser capable of reading Spring Boot style logs and extracting the following:
+
+timestamp  
+traceId / correlationId  
+HTTP method  
+URL  
+request body  
+response status  
+response body  
+
+Return a structured object called:
+
+HttpInteraction
+
+Example structure:
+
+{
+  timestamp: string
+  traceId: string
+  method: string
+  url: string
+  requestBody: string
+  responseBody: string
+  status: number
+}
+
+4. Flow Reconstruction
+
+Group interactions by traceId to reconstruct a request flow.
+
+Each traceId should represent a single integration test scenario.
+
+Sort interactions by timestamp.
+
+5. AI Scenario Generator
+
+Create a module called scenarioAgent.ts.
+
+This module should accept a list of interactions and generate test scenarios.
+
+Create a prompt template that instructs an LLM to:
+
+• Identify API flows
+• Identify dependencies between services
+• Generate integration test scenarios
+• Generate WireMock stubs
+
+Return JSON like:
+
+{
+  scenarios: [
+    {
+      name: "payment flow",
+      steps: [],
+      stubs: []
+    }
+  ]
+}
+
+Mock the AI response for now but structure the code so it can later call an LLM API.
+
+6. WireMock Stub Generator
+
+Create a generator that produces WireMock stub JSON files.
+
+Example format:
+
+{
+ "request": {
+   "method": "POST",
+   "url": "/payment"
+ },
+ "response": {
+   "status": 200,
+   "jsonBody": {
+     "status": "SUCCESS"
+   }
+ }
+}
+
+7. Integration Test Generator
+
+Generate a Spring Boot JUnit integration test using WireMock.
+
+Example output:
+
+@SpringBootTest
+@AutoConfigureWireMock(port = 8089)
+
+class PaymentFlowTest {
+
+@Test
+void testPaymentFlow(){
+
+stubFor(post("/payment")
+ .willReturn(okJson("{"status":"SUCCESS"}")));
+
+}
+
+}
+
+Also support a Karate test generator.
+
+8. File Writer
+
+Write generated files into the workspace:
+
+/src/test/java/generated/
+/src/test/resources/wiremock/
+
+9. Command Flow
+
+The command "Generate Integration Tests from Logs" should execute this sequence:
+
+select log file
+parse logs
+build interaction model
+group by traceId
+generate scenarios
+generate WireMock stubs
+generate integration tests
+write files to project
+
+10. Code Quality
+
+Use modular TypeScript code.
+Add interfaces for all models.
+Add logging to the VS Code output console.
+Make the code easy to extend.
+
+11. Bonus Features
+
+If possible add:
+
+• OpenAPI scanning support
+• ability to process multiple log files
+• command palette integration
+• progress indicator
+
+Return the complete VS Code extension source code including package.json and all modules.
