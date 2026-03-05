@@ -1,0 +1,358 @@
+You are a senior platform engineer and expert developer of GitHub Copilot extensions for Visual Studio Code.
+
+Your task is to build a VS Code extension that integrates with GitHub Copilot to automatically generate integration tests for microservices.
+
+Extension Name
+
+copilot-intelligent-test-generator
+
+The extension should allow users to generate integration tests using either:
+
+1 Local application log files
+OR
+2 Splunk distributed traces
+
+The extension should orchestrate prompts to GitHub Copilot which will analyze the collected data and generate integration tests.
+
+--------------------------------------------------
+
+GOAL
+
+Automatically generate integration tests by analyzing:
+
+• local log files OR Splunk traces
+• source code AST scanning
+• service dependency graphs
+
+Copilot should generate:
+
+integration test scenarios  
+WireMock stubs  
+JUnit integration test code
+
+--------------------------------------------------
+
+TECH STACK
+
+TypeScript  
+Node.js  
+VS Code Extension API  
+GitHub Copilot Chat API
+
+--------------------------------------------------
+
+PROJECT STRUCTURE
+
+Create the following folders:
+
+src/
+
+ extension.ts
+
+ commands/
+   generateTests.ts
+
+ parser/
+   logParser.ts
+   splunkTraceParser.ts
+
+ ast/
+   javaAstScanner.ts
+   nodeAstScanner.ts
+
+ builder/
+   interactionBuilder.ts
+
+ graph/
+   dependencyGraph.ts
+   graphBuilder.ts
+
+ copilot/
+   copilotPromptBuilder.ts
+   copilotAgent.ts
+
+ generator/
+   wiremockGenerator.ts
+   testGenerator.ts
+
+ models/
+   HttpInteraction.ts
+   ServiceNode.ts
+   ServiceEdge.ts
+   TestScenario.ts
+
+ utils/
+   fileWriter.ts
+   logger.ts
+
+Also create:
+
+package.json
+tsconfig.json
+README.md
+
+--------------------------------------------------
+
+EXTENSION COMMAND
+
+Create command:
+
+"Copilot: Generate Intelligent Integration Tests"
+
+When executed the extension must first ask the user to choose a data source.
+
+Use VS Code QuickPick with two options:
+
+• Local Log File
+• Splunk Traces
+
+--------------------------------------------------
+
+WORKFLOW OPTION 1 — LOCAL LOG FILES
+
+If user selects Local Log File:
+
+1 ask user to select a log file
+2 parse the log file
+3 extract HTTP interactions
+4 group interactions by traceId
+5 reconstruct service flows
+
+--------------------------------------------------
+
+WORKFLOW OPTION 2 — SPLUNK TRACES
+
+If user selects Splunk Traces:
+
+1 ask user for Splunk query or traceId
+2 call Splunk REST API
+3 retrieve distributed traces
+4 extract service flows
+5 convert traces into interaction objects
+
+Mock the Splunk API initially but design the module so it can call Splunk later.
+
+--------------------------------------------------
+
+COMMON PROCESSING STEPS
+
+After collecting interaction data from either source:
+
+1 scan workspace source code
+2 perform AST scanning
+3 extract endpoints and dependencies
+4 build service dependency graph
+5 combine
+
+logs or traces  
+AST data  
+service dependencies
+
+--------------------------------------------------
+
+LOG PARSER
+
+Implement logParser.ts.
+
+Extract
+
+timestamp  
+traceId  
+service name  
+HTTP method  
+URL  
+request body  
+response status  
+response body  
+
+Return HttpInteraction objects.
+
+--------------------------------------------------
+
+SPLUNK TRACE MODULE
+
+Implement splunkTraceParser.ts.
+
+Responsibilities
+
+connect to Splunk REST API  
+retrieve distributed traces  
+map traceId to services  
+
+Example response
+
+{
+ traceId:"123",
+ services:["gateway","auth-service","payment-service"]
+}
+
+--------------------------------------------------
+
+AST CODE SCANNER
+
+Implement
+
+javaAstScanner.ts  
+nodeAstScanner.ts
+
+Responsibilities
+
+scan code repository  
+detect REST endpoints  
+detect outbound service calls  
+detect dependencies
+
+Return metadata
+
+{
+ service:"",
+ endpoints:[],
+ dependencies:[]
+}
+
+--------------------------------------------------
+
+DEPENDENCY GRAPH
+
+Implement dependencyGraph.ts.
+
+Represent services as nodes and edges.
+
+Example
+
+gateway → auth-service  
+gateway → payment-service  
+payment-service → bank-api  
+
+--------------------------------------------------
+
+FLOW RECONSTRUCTION
+
+Implement interactionBuilder.ts.
+
+Group interactions by traceId.
+
+Sort by timestamp.
+
+Return ordered service call flows.
+
+--------------------------------------------------
+
+COPILOT PROMPT BUILDER
+
+Implement copilotPromptBuilder.ts.
+
+Build prompts sent to GitHub Copilot.
+
+Prompt must include:
+
+service dependency graph  
+log or trace interactions  
+API endpoints  
+
+Example prompt
+
+"Analyze the following microservice interactions and generate integration test scenarios using WireMock. Identify required mocks and produce test steps."
+
+--------------------------------------------------
+
+COPILOT AGENT
+
+Implement copilotAgent.ts.
+
+Responsibilities
+
+send prompt to GitHub Copilot Chat API  
+retrieve generated scenarios  
+parse response  
+
+--------------------------------------------------
+
+TEST GENERATION
+
+Use Copilot generated scenarios to produce:
+
+WireMock stub files  
+JUnit integration tests  
+
+Example structure
+
+@SpringBootTest
+@AutoConfigureWireMock(port = 8089)
+
+class PaymentFlowTest {
+
+@Test
+void testPaymentFlow(){
+
+stubFor(post("/payment")
+ .willReturn(okJson("{"status":"SUCCESS"}")));
+
+}
+
+}
+
+--------------------------------------------------
+
+FILE OUTPUT
+
+Generated files must be written to
+
+src/test/java/generated/
+src/test/resources/wiremock/
+
+--------------------------------------------------
+
+EXTENSION WORKFLOW SUMMARY
+
+User runs command
+
+Extension asks for data source
+
+Local logs
+OR
+Splunk traces
+
+Then pipeline executes:
+
+collect interaction data  
+scan AST  
+build dependency graph  
+send context to Copilot  
+Copilot generates scenarios  
+generate WireMock stubs  
+generate integration tests  
+write files to workspace
+
+--------------------------------------------------
+
+QUALITY REQUIREMENTS
+
+Use TypeScript interfaces
+Add logging
+Use VS Code output channel
+Add error handling
+Ensure modular architecture
+
+--------------------------------------------------
+
+BONUS FEATURES
+
+If possible implement:
+
+OpenAPI scanning
+multiple log file support
+progress indicator
+configuration settings
+
+--------------------------------------------------
+
+FINAL REQUIREMENT
+
+The extension must compile and run.
+
+Commands
+
+npm install
+npm run compile
+press F5 to launch extension host
